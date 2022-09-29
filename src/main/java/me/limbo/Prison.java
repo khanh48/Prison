@@ -4,6 +4,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 import me.limbo.Hooker.LuckPermsHooker;
 import me.limbo.Hooker.VaultHooker;
 import net.luckperms.api.model.group.Group;
@@ -54,5 +57,8 @@ public class Prison extends JavaPlugin{
 
 	public void removeGroup(Player player, String group) {
 		vault.getPermissions().playerRemoveGroup(player, group);
+	}
+	
+	public void createRegions(Player p) {
 	}
 }
