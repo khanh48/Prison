@@ -1,5 +1,6 @@
 package me.limbo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -16,11 +17,11 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PrefixNode;
 
 public class Prison extends JavaPlugin{
-	public static final String PRISONER = "Prisoner";
+	public static final String PRISONER = "prisoner";
 	private static Prison intance;
 	private LuckPermsHooker luckPerms;
 	private VaultHooker vault;
-	private ConfigManager data;
+	public ConfigManager data;
 	public CreateConstructure create;
 	
 	public Prison() {
@@ -34,6 +35,7 @@ public class Prison extends JavaPlugin{
 		vault = new VaultHooker();
 		luckPerms = new LuckPermsHooker();
 		create = new CreateConstructure();
+		getServer().getPluginManager().registerEvents(create, this);
 		new RegisterCommands();
 		addPrefixToGroup(PRISONER, nonFormat("[&0&lPrisoner&r]"), 3);
 	}
@@ -66,7 +68,7 @@ public class Prison extends JavaPlugin{
 	
 	public void addPrefixToGroup(String groupName, String prefix, int priority) {
 		PrefixNode node = PrefixNode.builder(prefix, priority).build();
-		Group group = luckPerms.getLuckPerms().getGroupManager().getGroup(groupName);
+		Group group = luckPerms.getLuckPerms().getGroupManager().createAndLoadGroup(groupName).join();
 		group.data().add(node);
 	}
 	
@@ -79,6 +81,7 @@ public class Prison extends JavaPlugin{
 	}
 	
 	public void createRegions(Player p) {
+
 	}
 	
 	public ConfigManager getData() {

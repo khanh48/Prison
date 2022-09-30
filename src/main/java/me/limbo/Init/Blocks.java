@@ -18,10 +18,11 @@ public class Blocks {
 	}
 	
 	List<Blocks> load(){
-		ConfigurationSection con = Prison.getIntance().getConfig().getConfigurationSection("oldBlocks");
+		ConfigurationSection con = Prison.getIntance().data.getConfig().getConfigurationSection("oldBlocks");
 		if(con == null) return null;
 		
 		for (String string : con.getKeys(false)) {
 		}
+		return null;
 	}
 }

@@ -15,10 +15,10 @@
     </repository>
     
     
-    <!--<repository> 
+    <repository> 
       <id>sk89q-repo</id>
       <url>https://maven.enginehub.org/repo/</url>
-    </repository>-->
+    </repository>
     
     <repository>
         <id>jitpack.io</id>
@@ -34,13 +34,13 @@
             <scope>provided</scope>
     </dependency>
     
-    <!-- 
+
     <dependency>
       <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.1.0-SNAPSHOT</version>
             <scope>provided</scope>
-    </dependency>-->
+    </dependency>
     
     <dependency>
         <groupId>net.luckperms</groupId>
@@ -55,13 +55,13 @@
         <scope>provided</scope>
     </dependency>
     
-    <dependency>
+<!--     <dependency>
       <groupId>com.sk89q.worldguard.bukkit</groupId>
       <artifactId>WorldGuardPlugin</artifactId>
       <version>7.0.8-SNAPSHOT+468-216b061</version>
       <scope>system</scope>
       <systemPath>${env.USERPROFILE}/Downloads/API/worldguard-bukkit-7.0.81.jar</systemPath>
-<!--  <systemPath>${env.USERPROFILE}/Documents/Spigot/Spigot-API/target/EasyWhitelist.jar</systemPath> -->
+
     </dependency>
     
     <dependency>
@@ -70,8 +70,9 @@
       <version>7.2.13-SNAPSHOT+1138-0ef38b5</version>
       <scope>system</scope>
       <systemPath>${env.USERPROFILE}/Downloads/API/worldedit-bukki4.jar</systemPath>
-<!--  <systemPath>${env.USERPROFILE}/Documents/Spigot/Spigot-API/target/EasyWhitelist.jar</systemPath> -->
+
     </dependency>
+    -->
   </dependencies>
   
   

@@ -53,7 +53,7 @@ public class CreateConstructure implements Listener{
 		zMax = z + radius;
 		
 		Bukkit.getScheduler().runTask(prison, () -> {
-			Location loc = new Location(player.getWorld(), x, y, z);
+			Location loc = new Location(world, x, y, z);
 			
 			for(int j = yMin; j <= yMax; j++) {
 				for(int i = xMin; i <= xMax; i++) {
@@ -68,18 +68,17 @@ public class CreateConstructure implements Listener{
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
-					loc.serialize();
 				}
 				
 				for(int i = zMin; i <= zMax; i++) {
-					loc.setX(i);
+					loc.setX(xMin);
 					loc.setY(j);
-					loc.setZ(xMin);
+					loc.setZ(i);
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
 
-					loc.setZ(xMax);
+					loc.setX(xMax);
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
@@ -89,13 +88,13 @@ public class CreateConstructure implements Listener{
 			for(int i = xMin; i <= xMax; i++) {
 				for(int j = zMin; j <= zMax; j++) {
 					loc.setX(i);
-					loc.setY(j);
-					loc.setZ(yMin);
+					loc.setY(yMin);
+					loc.setZ(j);
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
 
-					loc.setZ(yMax);
+					loc.setY(yMax);
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
