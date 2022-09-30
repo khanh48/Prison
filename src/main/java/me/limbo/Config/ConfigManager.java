@@ -32,17 +32,17 @@ public class ConfigManager{
 	
 	public void reloadConfig() {
 		this.customConfig = YamlConfiguration.loadConfiguration(this.customConfigFile);
-		InputStream defConfigStream = main.getResource(name + ".yml");
+		InputStream defConfigStream = main.getResource(name);
 		if (defConfigStream == null)
 			return;
 		this.customConfig.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
 	}
 	
 	public void createConfig() {
-		customConfigFile = new File(main.getDataFolder(), name + ".yml");
+		customConfigFile = new File(main.getDataFolder(), name);
 		if(!customConfigFile.exists()) {
 			customConfigFile.getParentFile().mkdirs();
-			main.saveResource(name + ".yml", false);
+			main.saveResource(name, false);
 		}
 		
 		customConfig = new YamlConfiguration();

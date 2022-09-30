@@ -68,6 +68,7 @@ public class CreateConstructure implements Listener{
 					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
 					world.getBlockAt(loc).setType(Material.GLASS);
 					newBlock.add(loc);
+					loc.serialize();
 				}
 				
 				for(int i = zMin; i <= zMax; i++) {
