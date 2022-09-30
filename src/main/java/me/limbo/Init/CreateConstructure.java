@@ -1,12 +1,12 @@
 package me.limbo.Init;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,12 +27,17 @@ public class CreateConstructure implements Listener{
 	int y, yMin, yMax;
 	int z, zMin, zMax;
 	World world;
+	List<Blocks> oldBlock;
+	List<Location> newBlock;
 	
 	public CreateConstructure(){
 		prison = Prison.getIntance();
+		oldBlock = new ArrayList<>();
+		newBlock = new ArrayList<>();
 	}
 	
 	public void create(Player player, int radius) {
+		if(world != null) undo();
 		location = player.getLocation();
 		x = (int) player.getLocation().getX();
 		y = (int) player.getLocation().getY();
@@ -55,20 +60,28 @@ public class CreateConstructure implements Listener{
 					loc.setX(i);
 					loc.setY(j);
 					loc.setZ(zMin);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 
 					loc.setZ(zMax);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 				}
 				
 				for(int i = zMin; i <= zMax; i++) {
 					loc.setX(i);
 					loc.setY(j);
 					loc.setZ(xMin);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 
 					loc.setZ(xMax);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 				}
 			}
 
@@ -77,10 +90,14 @@ public class CreateConstructure implements Listener{
 					loc.setX(i);
 					loc.setY(j);
 					loc.setZ(yMin);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 
 					loc.setZ(yMax);
-					loc.getBlock().setType(Material.GLASS);
+					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					world.getBlockAt(loc).setType(Material.GLASS);
+					newBlock.add(loc);
 				}
 			}
 			
@@ -88,7 +105,14 @@ public class CreateConstructure implements Listener{
 	}
 	
 	void undo() {
-		
+		for (Location location : newBlock) {
+			world.getBlockAt(location).setType(Material.AIR);
+		}
+		newBlock.clear();
+		for (Blocks blocks : oldBlock) {
+			world.setBlockData(blocks.location, blocks.block.getBlockData());
+		}
+		oldBlock.clear();
 	}
 
 	@EventHandler
