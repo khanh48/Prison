@@ -1,0 +1,25 @@
+name: Prison
+main: me.limbo.Prison
+author: Limbo48
+version: 1.0
+api-version: 1.18
+depend: [Vault, LuckPerms]
+
+commands:
+  prison:
+    description: Prison
+    aliases: [ps]
+  preload:
+    description: Reload config
+    aliases: [prl]
+  setprisoner:
+    description: Add role Prisoner
+    aliases: [sp, sps]
+
+permissions:
+  prison.admin:
+    default: op
+    children:
+      prison.manager: true
+  prison.manager:
+    default: op
