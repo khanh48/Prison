@@ -28,12 +28,10 @@ public class CreateConstructure implements Listener{
 	int z, zMin, zMax;
 	World world;
 	List<Blocks> oldBlock;
-	List<Location> newBlock;
 	
 	public CreateConstructure(){
 		prison = Prison.getIntance();
 		oldBlock = new ArrayList<>();
-		newBlock = new ArrayList<>();
 	}
 	
 	public void create(Player player, int radius) {
@@ -55,33 +53,29 @@ public class CreateConstructure implements Listener{
 		Bukkit.getScheduler().runTask(prison, () -> {
 			Location loc = new Location(world, x, y, z);
 			
-			for(int j = yMin; j <= yMax; j++) {
+			for(int j = yMin + 1; j < yMax; j++) {
 				for(int i = xMin; i <= xMax; i++) {
 					loc.setX(i);
 					loc.setY(j);
 					loc.setZ(zMin);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
-					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
+					world.getBlockAt(loc).setType(Material.IRON_BARS);
 
 					loc.setZ(zMax);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
-					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
+					world.getBlockAt(loc).setType(Material.IRON_BARS);
 				}
 				
-				for(int i = zMin; i <= zMax; i++) {
+				for(int i = zMin + 1; i < zMax; i++) {
 					loc.setX(xMin);
 					loc.setY(j);
 					loc.setZ(i);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
-					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
+					world.getBlockAt(loc).setType(Material.IRON_BARS);
 
 					loc.setX(xMax);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
-					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
+					world.getBlockAt(loc).setType(Material.IRON_BARS);
 				}
 			}
 
@@ -90,14 +84,12 @@ public class CreateConstructure implements Listener{
 					loc.setX(i);
 					loc.setY(yMin);
 					loc.setZ(j);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
-					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
+					world.getBlockAt(loc).setType(Material.SEA_LANTERN);
 
 					loc.setY(yMax);
-					oldBlock.add(new Blocks(loc, world.getBlockAt(loc)));
+					oldBlock.add(new Blocks(loc.clone(), world.getBlockAt(loc).getType()));
 					world.getBlockAt(loc).setType(Material.GLASS);
-					newBlock.add(loc);
 				}
 			}
 			
@@ -105,12 +97,8 @@ public class CreateConstructure implements Listener{
 	}
 	
 	void undo() {
-		for (Location location : newBlock) {
-			world.getBlockAt(location).setType(Material.AIR);
-		}
-		newBlock.clear();
 		for (Blocks blocks : oldBlock) {
-			world.setBlockData(blocks.location, blocks.block.getBlockData());
+			world.getBlockAt(blocks.location).setType(blocks.block);
 		}
 		oldBlock.clear();
 	}
@@ -141,6 +129,7 @@ public class CreateConstructure implements Listener{
 		if(e.getMaterial().equals(Material.ENDER_PEARL)) {
 			if(inside(e.getPlayer().getLocation())) e.setCancelled(true);
 		}
+		if(e.getClickedBlock() == null) return;
 		if(e.getClickedBlock().getType().getKey().toString().toLowerCase().contains("door")) {
 			e.setCancelled(true);
 		}
