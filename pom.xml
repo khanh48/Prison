@@ -15,11 +15,11 @@
     </repository>
     
     
-    <repository> 
+<!--     <repository> 
       <id>sk89q-repo</id>
       <url>https://maven.enginehub.org/repo/</url>
     </repository>
-    
+    -->
     <repository>
         <id>jitpack.io</id>
         <url>https://jitpack.io</url>
@@ -34,14 +34,14 @@
             <scope>provided</scope>
     </dependency>
     
-
+<!-- 
     <dependency>
       <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.1.0-SNAPSHOT</version>
             <scope>provided</scope>
     </dependency>
-    
+    -->
     <dependency>
         <groupId>net.luckperms</groupId>
         <artifactId>api</artifactId>

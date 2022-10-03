@@ -2,7 +2,7 @@ package me.limbo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +12,7 @@ import me.limbo.Config.ConfigManager;
 import me.limbo.Hooker.LuckPermsHooker;
 import me.limbo.Hooker.VaultHooker;
 import me.limbo.Init.CreateConstructure;
+import me.limbo.Init.Prisoner;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PrefixNode;
@@ -21,7 +22,7 @@ public class Prison extends JavaPlugin{
 	private static Prison intance;
 	private LuckPermsHooker luckPerms;
 	private VaultHooker vault;
-	public ConfigManager data;
+	public ConfigManager data, message;
 	public CreateConstructure create;
 	
 	public Prison() {
@@ -32,12 +33,20 @@ public class Prison extends JavaPlugin{
 	public void onEnable() {
 		saveDefaultConfig();
 		data = new ConfigManager("data");
+		message = new ConfigManager("message");
 		vault = new VaultHooker();
 		luckPerms = new LuckPermsHooker();
 		create = new CreateConstructure();
 		getServer().getPluginManager().registerEvents(create, this);
 		new RegisterCommands();
-		addPrefixToGroup(PRISONER, nonFormat("[&0&lPrisoner&r]"), 3);
+		addPrefixToGroup(PRISONER, nonFormat("[&7&lPrisoner&r]"), 3);
+	}
+	
+	@Override
+	public void onDisable() {
+		create.saveOnDisable();
+		sendMessage(Bukkit.getConsoleSender(), "Goodbye...");
+		super.onDisable();
 	}
 	
 	public static Prison getIntance() {
@@ -72,8 +81,13 @@ public class Prison extends JavaPlugin{
 		group.data().add(node);
 	}
 	
-	public void setPrisoner(Player player) {
+	public void setPrisoner(Player player, int time) {
+		player.teleport(CreateConstructure.location);
 		vault.getPermissions().playerAddGroup(player, PRISONER);
+		CreateConstructure.prisoners.add(new Prisoner(player, time, time));
+		if(CreateConstructure.bossBarLoader.isCancelled()) {
+			CreateConstructure.bossBarLoader.runTaskTimer(this, 20, 20);
+		}
 	}
 
 	public void unSetPrisoner(Player player) {
@@ -82,9 +96,20 @@ public class Prison extends JavaPlugin{
 	
 	public void createRegions(Player p) {
 
-	}
+	}	
 	
 	public ConfigManager getData() {
 		return this.data;
+	}
+	
+	public boolean isAdmin(Player player) {
+		return player.hasPermission("prison.admin") || player.hasPermission("prison.manager");
+	}
+	
+	public void freePlayer(Player player) {
+		unSetPrisoner(player);
+		player.teleport(new Location(player.getWorld(), create.x, create.yMax + 1, create.z));
+		Prisoner prisoner = create.searchIn(player);
+		if(prisoner != null) prisoner.bar.setVisible(false);
 	}
 }
