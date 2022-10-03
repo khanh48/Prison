@@ -33,7 +33,7 @@ public class Prison extends JavaPlugin{
 	public void onEnable() {
 		saveDefaultConfig();
 		data = new ConfigManager("data");
-		message = new ConfigManager("message");
+		message = new ConfigManager("message.yml");
 		vault = new VaultHooker();
 		luckPerms = new LuckPermsHooker();
 		create = new CreateConstructure();
