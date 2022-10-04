@@ -81,12 +81,12 @@ public class Prison extends JavaPlugin{
 		group.data().add(node);
 	}
 	
-	public void setPrisoner(Player player, int time) {
+	public void setPrisoner(Player player, double time) {
 		player.teleport(CreateConstructure.location);
 		vault.getPermissions().playerAddGroup(player, PRISONER);
-		CreateConstructure.prisoners.add(new Prisoner(player, time, time));
+		CreateConstructure.prisoners.put(player.getUniqueId(), new Prisoner(player, time, time));
 		if(CreateConstructure.bossBarLoader.isCancelled()) {
-			CreateConstructure.bossBarLoader.runTaskTimer(this, 20, 20);
+			CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
 		}
 	}
 
@@ -106,10 +106,20 @@ public class Prison extends JavaPlugin{
 		return player.hasPermission("prison.admin") || player.hasPermission("prison.manager");
 	}
 	
+	public void reload() {
+		
+	}
+	
 	public void freePlayer(Player player) {
 		unSetPrisoner(player);
 		player.teleport(new Location(player.getWorld(), create.x, create.yMax + 1, create.z));
-		Prisoner prisoner = create.searchIn(player);
-		if(prisoner != null) prisoner.bar.setVisible(false);
+		Prisoner p = CreateConstructure.prisoners.get(player.getUniqueId());
+		p.time = 0;
+		p.timeLeft = 0;
+		p.save();
+		if(p != null) {
+			p.bar.setVisible(false);
+			CreateConstructure.prisoners.remove(player.getUniqueId());
+		}
 	}
 }

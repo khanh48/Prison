@@ -38,79 +38,78 @@ public class OCommand implements CommandExecutor, TabCompleter{
 		if(sender instanceof Player) {
 			isPlayer = true;
 			Player player = (Player) sender;
-			if(args.length > 0) {
-				if(args[0].equalsIgnoreCase("setup")) {
-					if(!prison.isAdmin(player)) {
-						Prison.sendMessage(player, Message.HASNT_PERM);
-						return false;
+			Player nPlayer;
+			if(args.length > 0)
+			switch (args[0].hashCode()) {
+			case 109329021: //setup
+				if(!prison.isAdmin(player)) {
+					Prison.sendMessage(player, Message.HASNT_PERM);
+					return false;
+				}
+				if(args.length > 1) {
+					try {
+						prison.create.create(player, Integer.parseInt(args[1]));
+						return true;
+					}catch (Exception e) {
+						Prison.sendMessage(sender, Message.NUMBER_ERROR);
 					}
-					if(args.length > 1) {
+				}
+				prison.create.create(player, 5);
+				return true;
+
+			case 113762:  //set
+				if(args.length < 2) break;
+				if(!prison.isAdmin(player)) {
+					Prison.sendMessage(player, Message.HASNT_PERM);
+					return false;
+				}
+				nPlayer = Bukkit.getPlayerExact(args[1]);
+				if(nPlayer == null)
+					Prison.sendMessage(sender, Message.PLAYER_NOT_FOUND);
+				else {
+					if(args.length > 2) {
 						try {
-							prison.create.create(player, Integer.parseInt(args[1]));
-							return true;
+							prison.setPrisoner(nPlayer, Double.parseDouble(args[2]));
 						}catch (Exception e) {
 							Prison.sendMessage(sender, Message.NUMBER_ERROR);
 						}
+					}else {
+						prison.setPrisoner(nPlayer, -1);
 					}
-					prison.create.create(player, 5);
 					return true;
 				}
-				if(args.length > 1) {
-					if(args[0].equalsIgnoreCase("remove")) {
-						if(!prison.isAdmin(player)) {
-							Prison.sendMessage(player, Message.HASNT_PERM);
-							return false;
-						}
-						Player nplayer = Bukkit.getPlayerExact(args[1]);
-						if(nplayer == null)
-							Prison.sendMessage(sender, Message.PLAYER_NOT_FOUND);
-						else {
-							prison.freePlayer(nplayer);
-							return true;
-						}
-						return false;
-					}
-					else if(args[0].equalsIgnoreCase("set")) {
-						if(!prison.isAdmin(player)) {
-							Prison.sendMessage(player, Message.HASNT_PERM);
-							return false;
-						}
-						if(args.length > 2) {
-							Player nPlayer = Bukkit.getPlayerExact(args[1]);
-							if(nPlayer == null)
-								Prison.sendMessage(sender, Message.PLAYER_NOT_FOUND);
-							else {
-								try {
-									prison.setPrisoner(nPlayer, Integer.parseInt(args[2]));
-									return true;
-								}catch (Exception e) {
-									Prison.sendMessage(sender, Message.NUMBER_ERROR);
-								}
-							}
-							return false;
-						}
-						else if(args.length > 1) {
-							Player nPlayer = Bukkit.getPlayerExact(args[1]);
-							if(nPlayer == null)
-								Prison.sendMessage(sender, Message.PLAYER_NOT_FOUND);
-							else {
-								prison.setPrisoner(nPlayer, -1);
-								return true;
-							}
-							return false;
-						}
-					}
-				}
-			}
+				return false;
 
-		}
-
-		if(args.length > 0)
-			if(args[0].equalsIgnoreCase("reload")) {
-				if(!sender.hasPermission("prison.admin")) {
-					Prison.sendMessage(sender, Message.HASNT_PERM);
+			case -934610812: //remove
+				if(args.length < 2) break;
+				if(!prison.isAdmin(player)) {
+					Prison.sendMessage(player, Message.HASNT_PERM);
 					return false;
 				}
+				nPlayer = Bukkit.getPlayerExact(args[1]);
+				if(nPlayer == null)
+					Prison.sendMessage(sender, Message.PLAYER_NOT_FOUND);
+				else {
+					prison.freePlayer(nPlayer);
+					return true;
+				}
+				return false;
+			case -934641255: //reload
+
+				if(!player.hasPermission("prison.admin")) {
+					Prison.sendMessage(player, Message.HASNT_PERM);
+					return false;
+				}
+				prison.reload();
+				Prison.sendMessage(player, Message.RELOAD);
+				return true;
+			default:
+				help();
+				return true;
+			}
+		}
+		if(args.length > 0)
+			if(args[0].equalsIgnoreCase("reload") && !isPlayer) {
 				prison.reload();
 				Prison.sendMessage(sender, Message.RELOAD);
 				return true;

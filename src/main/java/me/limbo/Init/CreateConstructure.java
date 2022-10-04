@@ -1,8 +1,9 @@
 package me.limbo.Init;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,14 +34,14 @@ public class CreateConstructure implements Listener{
 	World world;
 	static List<Blocks> oldBlock;
 	public static BukkitRunnable bossBarLoader;
-	public static List<Prisoner> prisoners;
+	public static ConcurrentHashMap<UUID, Prisoner> prisoners;
 	static int interval = 3, count = 0;
 	
 	
 	public CreateConstructure(){
 		prison = Prison.getIntance();
 		oldBlock = new ArrayList<>();
-		prisoners = new ArrayList<>();
+		prisoners = new ConcurrentHashMap<>();
 		load();
 		
 		bossBarLoader = new BukkitRunnable() {
@@ -54,20 +55,16 @@ public class CreateConstructure implements Listener{
 					return;
 				}
 				
-				Iterator<Prisoner> ite = prisoners.iterator();
-				while (ite.hasNext()) {
-					Prisoner pr = ite.next();
+				for (Prisoner pr : prisoners.values()) {
 					if(count == interval) {
 						prison.data.getConfig().set("prisoners." + pr.player.getName() + ".time", pr.time);
 						prison.data.getConfig().set("prisoners." + pr.player.getName() + ".timeLeft", pr.timeLeft);
 					}
 					if(pr.timeLeft == 0) {
-						pr.save();
-						ite.remove();
 						prison.freePlayer(pr.player);
 					}
 					if(pr.time < 0) return;
-					double cur = (double) pr.timeLeft / pr.time;
+					double cur = pr.timeLeft / pr.time;
 					pr.bar.setProgress(cur);
 					pr.timeLeft -= 1;
 				}
@@ -137,9 +134,8 @@ public class CreateConstructure implements Listener{
 					world.getBlockAt(loc).setType(Material.GLASS);
 				}
 			}
-			
+			save();
 		});
-		save();
 	}
 	
 	void undo() {
@@ -199,7 +195,7 @@ public class CreateConstructure implements Listener{
 		int timeLeft = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".timeLeft");
 		if(timeLeft != 0) {
 			int totalTime = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".time");
-			prisoners.add(new Prisoner(e.getPlayer(), totalTime, timeLeft));
+			prisoners.put(e.getPlayer().getUniqueId(), new Prisoner(e.getPlayer(), totalTime, timeLeft));
 			if(bossBarLoader.isCancelled())
 				bossBarLoader.runTaskTimer(prison, 20, 20);
 		}
@@ -207,24 +203,18 @@ public class CreateConstructure implements Listener{
 	
 	@EventHandler
 	public void saveOnLeave(PlayerQuitEvent e) {
-		Prisoner tmp = searchIn(e.getPlayer());
+		Prisoner tmp = prisoners.get(e.getPlayer().getUniqueId());
 		if(tmp != null) {
 			tmp.save();
-			prisoners.remove(tmp);
+			prisoners.remove(e.getPlayer().getUniqueId());
 		}
 	}
 	
+	@EventHandler
 	public void saveOnDisable() {
-		for (Prisoner prisoner : prisoners) {
+		for (Prisoner prisoner : prisoners.values()) {
 			prisoner.save();
 		}
-	}
-	
-	public Prisoner searchIn(Player player) {
-		for (Prisoner prisoner : prisoners)
-			if(player.getName().equalsIgnoreCase(prison.getName())) 
-				return prisoner;
-		return null;
 	}
 	
 	boolean inside(Location loc) {

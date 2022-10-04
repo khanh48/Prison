@@ -1,0 +1,5 @@
+message:
+  console: "You can't use this command with console!"
+  player-not-found: "Player not found!"
+  number-error: "You need to enter the number!"
+  hasnt-perm: "You do not have permisson to do this"

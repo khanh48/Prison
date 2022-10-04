@@ -12,9 +12,9 @@ import me.limbo.Prison;
 public class Prisoner {
 	public Player player;
 	public BossBar bar;
-	public int time, timeLeft;
+	public double time, timeLeft;
 	
-	public Prisoner(Player player, int time, int timeLeft) {
+	public Prisoner(Player player, double time, double timeLeft) {
 		this.player = player;
 		this.time = time;
 		this.timeLeft = timeLeft;
@@ -23,11 +23,11 @@ public class Prisoner {
 		if(time <= -1)
 			bar.setProgress(1D); 
 		else
-			bar.setProgress((double)timeLeft / time); 
+			bar.setProgress(timeLeft / time); 
 		bar.setVisible(true);
 	}
 	
-	void save() {
+	public void save() {
 		Prison prison = Prison.getIntance();
 		prison.data.getConfig().set("prisoners." + this.player.getPlayer().getName() + ".time", this.time);
 		prison.data.getConfig().set("prisoners." + this.player.getPlayer().getName() + ".timeLeft", this.timeLeft);
