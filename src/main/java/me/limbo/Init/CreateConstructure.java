@@ -196,8 +196,12 @@ public class CreateConstructure implements Listener{
 		if(timeLeft != 0) {
 			int totalTime = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".time");
 			prisoners.put(e.getPlayer().getUniqueId(), new Prisoner(e.getPlayer(), totalTime, timeLeft));
+			try {
 			if(bossBarLoader.isCancelled())
 				bossBarLoader.runTaskTimer(prison, 20, 20);
+			}catch (IllegalStateException ex) {
+				bossBarLoader.runTaskTimer(prison, 20, 20);
+			}
 		}
 	}
 	
@@ -235,7 +239,7 @@ public class CreateConstructure implements Listener{
 			Location loc;
 			Material mat;
 			loc = Prison.getIntance().data.getConfig().getLocation("redo." + string + ".location");
-			mat = (Material) Prison.getIntance().data.getConfig().get("redo." + string + ".material");
+			mat = Material.getMaterial(Prison.getIntance().data.getConfig().getString("redo." + string + ".material"));
 			oldBlock.add(new Blocks(loc, mat));
 		}
 		
@@ -256,7 +260,7 @@ public class CreateConstructure implements Listener{
 		for(int i = 0; i < oldBlock.size(); i++) {
 			Blocks blocks = oldBlock.get(i);
 			prison.data.getConfig().set("redo." + i + ".location", blocks.location);
-			prison.data.getConfig().set("redo." + i + ".material", blocks.block);
+			prison.data.getConfig().set("redo." + i + ".material", blocks.block.getKey().toString().toUpperCase());
 		}
 		
 		prison.data.getConfig().set("location", location);

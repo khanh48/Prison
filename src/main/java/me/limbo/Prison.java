@@ -85,7 +85,10 @@ public class Prison extends JavaPlugin{
 		player.teleport(CreateConstructure.location);
 		vault.getPermissions().playerAddGroup(player, PRISONER);
 		CreateConstructure.prisoners.put(player.getUniqueId(), new Prisoner(player, time, time));
-		if(CreateConstructure.bossBarLoader.isCancelled()) {
+		try {
+			if(CreateConstructure.bossBarLoader.isCancelled())
+				CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
+		}catch (IllegalStateException e) {
 			CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
 		}
 	}

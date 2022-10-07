@@ -51,7 +51,7 @@ public class OCommand implements CommandExecutor, TabCompleter{
 						prison.create.create(player, Integer.parseInt(args[1]));
 						return true;
 					}catch (Exception e) {
-						Prison.sendMessage(sender, Message.NUMBER_ERROR);
+						Prison.sendMessage(sender, e.getMessage());
 					}
 				}
 				prison.create.create(player, 5);
@@ -71,7 +71,7 @@ public class OCommand implements CommandExecutor, TabCompleter{
 						try {
 							prison.setPrisoner(nPlayer, Double.parseDouble(args[2]));
 						}catch (Exception e) {
-							Prison.sendMessage(sender, Message.NUMBER_ERROR);
+							Prison.sendMessage(sender, e.getMessage());
 						}
 					}else {
 						prison.setPrisoner(nPlayer, -1);
