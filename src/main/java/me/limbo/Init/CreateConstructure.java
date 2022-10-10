@@ -52,10 +52,10 @@ public class CreateConstructure implements Listener{
 			@Override
 			public void run() {
 				
+				count++;
 				if(prisoners.isEmpty()) {
 					return;
 				}
-				count++;
 				
 				for (Prisoner pr : prisoners.values()) {
 					if(count == interval) {
@@ -200,6 +200,7 @@ public class CreateConstructure implements Listener{
 		if(timeLeft != 0D) {
 			int totalTime = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".time");
 			prisoners.put(e.getPlayer().getUniqueId(), new Prisoner(e.getPlayer(), totalTime, timeLeft, data.getConfig().getLocation("prisoners." + e.getPlayer().getName() + ".oldLocation")));
+			prison.addGroup(e.getPlayer(), Prison.PRISONER);
 		}
 	}
 	

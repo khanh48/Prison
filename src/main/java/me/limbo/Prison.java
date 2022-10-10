@@ -88,9 +88,9 @@ public class Prison extends JavaPlugin{
 	}
 	
 	public void setPrisoner(Player player, double time) {
-		player.teleport(CreateConstructure.location);
-		this.addGroup(player, PRISONER);
 		CreateConstructure.prisoners.put(player.getUniqueId(), new Prisoner(player, time, time, player.getLocation()));
+		this.addGroup(player, PRISONER);
+		player.teleport(CreateConstructure.location);
 	}
 
 	public void unSetPrisoner(Player player) {
