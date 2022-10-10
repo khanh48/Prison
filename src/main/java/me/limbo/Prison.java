@@ -15,6 +15,8 @@ import me.limbo.Init.CreateConstructure;
 import me.limbo.Init.Prisoner;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.DisplayNameNode;
+import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PrefixNode;
 
 public class Prison extends JavaPlugin{
@@ -40,6 +42,7 @@ public class Prison extends JavaPlugin{
 		getServer().getPluginManager().registerEvents(create, this);
 		new RegisterCommands();
 		addPrefixToGroup(PRISONER, nonFormat("[&7&lPrisoner&r]"), 3);
+		CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
 	}
 	
 	@Override
@@ -69,6 +72,7 @@ public class Prison extends JavaPlugin{
 	    return intance.vault.getPermissions().playerInGroup(player, PRISONER);
 	}
 	
+	
 	public void addPrefixForPlayer(Player player, String prefix, int priority) {
 		User user = luckPerms.getLuckPerms().getPlayerAdapter(Player.class).getUser(player);
 		PrefixNode node = PrefixNode.builder(prefix, priority).build();
@@ -78,28 +82,36 @@ public class Prison extends JavaPlugin{
 	public void addPrefixToGroup(String groupName, String prefix, int priority) {
 		PrefixNode node = PrefixNode.builder(prefix, priority).build();
 		Group group = luckPerms.getLuckPerms().getGroupManager().createAndLoadGroup(groupName).join();
+		DisplayNameNode displayNameNode = DisplayNameNode.builder("Prisoner").build();
+		group.data().add(displayNameNode);
 		group.data().add(node);
 	}
 	
 	public void setPrisoner(Player player, double time) {
 		player.teleport(CreateConstructure.location);
-		vault.getPermissions().playerAddGroup(player, PRISONER);
-		CreateConstructure.prisoners.put(player.getUniqueId(), new Prisoner(player, time, time));
-		try {
-			if(CreateConstructure.bossBarLoader.isCancelled())
-				CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
-		}catch (IllegalStateException e) {
-			CreateConstructure.bossBarLoader.runTaskTimer(intance, 20, 20);
-		}
+		this.addGroup(player, PRISONER);
+		CreateConstructure.prisoners.put(player.getUniqueId(), new Prisoner(player, time, time, player.getLocation()));
 	}
 
 	public void unSetPrisoner(Player player) {
-		vault.getPermissions().playerRemoveGroup(player, PRISONER);
+		this.removeGroup(player, PRISONER);
 	}
 	
-	public void createRegions(Player p) {
-
-	}	
+	public void addGroup(Player player, String group) {
+		if(Prison.isPrisoner(player)) return;
+		User user = luckPerms.getLuckPerms().getPlayerAdapter(Player.class).getUser(player);
+		user.data().add(InheritanceNode.builder(group).build());
+	}
+	
+	public void removeGroup(Player player, String group) {
+		if(!Prison.isPrisoner(player)) return;
+		User user = luckPerms.getLuckPerms().getPlayerAdapter(Player.class).getUser(player);
+		user.data().remove(InheritanceNode.builder(group).build());
+	}
+	
+	boolean isPlayerInGroup(Player player, String group){
+		return player.hasPermission("group." + group);
+	}
 	
 	public ConfigManager getData() {
 		return this.data;
@@ -115,12 +127,12 @@ public class Prison extends JavaPlugin{
 	
 	public void freePlayer(Player player) {
 		unSetPrisoner(player);
-		player.teleport(new Location(player.getWorld(), create.x, create.yMax + 1, create.z));
 		Prisoner p = CreateConstructure.prisoners.get(player.getUniqueId());
-		p.time = 0;
-		p.timeLeft = 0;
-		p.save();
 		if(p != null) {
+			p.time = 0;
+			p.timeLeft = 0;
+			p.save();
+			player.teleport(p.oldLocation);
 			p.bar.setVisible(false);
 			CreateConstructure.prisoners.remove(player.getUniqueId());
 		}

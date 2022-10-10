@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.limbo.Prison;
+import me.limbo.Config.ConfigManager;
 
 public class CreateConstructure implements Listener{
 	private final Prison prison;
@@ -31,6 +32,7 @@ public class CreateConstructure implements Listener{
 	public int x, xMin, xMax;
 	public int y, yMin, yMax;
 	public int z, zMin, zMax;
+	ConfigManager data;
 	World world;
 	static List<Blocks> oldBlock;
 	public static BukkitRunnable bossBarLoader;
@@ -40,6 +42,7 @@ public class CreateConstructure implements Listener{
 	
 	public CreateConstructure(){
 		prison = Prison.getIntance();
+		data = prison.data;
 		oldBlock = new ArrayList<>();
 		prisoners = new ConcurrentHashMap<>();
 		load();
@@ -48,23 +51,24 @@ public class CreateConstructure implements Listener{
 			
 			@Override
 			public void run() {
-				count++;
 				
 				if(prisoners.isEmpty()) {
-					this.cancel();
 					return;
 				}
+				count++;
 				
 				for (Prisoner pr : prisoners.values()) {
 					if(count == interval) {
-						prison.data.getConfig().set("prisoners." + pr.player.getName() + ".time", pr.time);
-						prison.data.getConfig().set("prisoners." + pr.player.getName() + ".timeLeft", pr.timeLeft);
+						data.getConfig().set("prisoners." + pr.player.getName() + ".time", pr.time);
+						data.getConfig().set("prisoners." + pr.player.getName() + ".timeLeft", pr.timeLeft);
+						data.getConfig().set("prisoners." + pr.player.getName() + ".oldLocation", pr.oldLocation);
 					}
-					if(pr.timeLeft == 0) {
+					if(pr.timeLeft <= 0D && pr.time > 0) {
 						prison.freePlayer(pr.player);
 					}
 					if(pr.time < 0) return;
 					double cur = pr.timeLeft / pr.time;
+					cur = cur > 0D?cur <= 1D? cur : 1 : 0;
 					pr.bar.setProgress(cur);
 					pr.timeLeft -= 1;
 				}
@@ -192,16 +196,10 @@ public class CreateConstructure implements Listener{
 	
 	@EventHandler
 	public void loadOnJoin(PlayerJoinEvent e) {
-		int timeLeft = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".timeLeft");
-		if(timeLeft != 0) {
+		int timeLeft = data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".timeLeft");
+		if(timeLeft != 0D) {
 			int totalTime = prison.data.getConfig().getInt("prisoners." + e.getPlayer().getName() + ".time");
-			prisoners.put(e.getPlayer().getUniqueId(), new Prisoner(e.getPlayer(), totalTime, timeLeft));
-			try {
-			if(bossBarLoader.isCancelled())
-				bossBarLoader.runTaskTimer(prison, 20, 20);
-			}catch (IllegalStateException ex) {
-				bossBarLoader.runTaskTimer(prison, 20, 20);
-			}
+			prisoners.put(e.getPlayer().getUniqueId(), new Prisoner(e.getPlayer(), totalTime, timeLeft, data.getConfig().getLocation("prisoners." + e.getPlayer().getName() + ".oldLocation")));
 		}
 	}
 	
@@ -214,7 +212,6 @@ public class CreateConstructure implements Listener{
 		}
 	}
 	
-	@EventHandler
 	public void saveOnDisable() {
 		for (Prisoner prisoner : prisoners.values()) {
 			prisoner.save();
@@ -260,7 +257,7 @@ public class CreateConstructure implements Listener{
 		for(int i = 0; i < oldBlock.size(); i++) {
 			Blocks blocks = oldBlock.get(i);
 			prison.data.getConfig().set("redo." + i + ".location", blocks.location);
-			prison.data.getConfig().set("redo." + i + ".material", blocks.block.getKey().toString().toUpperCase());
+			prison.data.getConfig().set("redo." + i + ".material", blocks.block.getKey().getKey().toUpperCase());
 		}
 		
 		prison.data.getConfig().set("location", location);
